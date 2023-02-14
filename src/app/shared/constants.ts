@@ -1,3 +1,3 @@
 export class Constants {
-    public static readonly POKEDEX_URL = 'pokedex'
+    public static readonly POKEDEX_ROUTE = 'pokedex'
 }

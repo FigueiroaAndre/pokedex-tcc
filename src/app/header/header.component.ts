@@ -14,9 +14,9 @@ import { Constants } from '../shared/constants';
 })
 export class HeaderComponent {
 
-    constructor(private router: Router) {}
+  constructor(private router: Router) {}
 
-    navigateToPokedex(): void {
-        this.router.navigate([Constants.POKEDEX_URL])
-    }
+  navigateToPokedex(): void {
+    this.router.navigate([Constants.POKEDEX_ROUTE])
+  }
 }

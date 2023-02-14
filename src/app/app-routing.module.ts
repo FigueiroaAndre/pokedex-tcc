@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { Constants } from './shared/constants';
 
 const routes: Routes = [
-    { path: Constants.POKEDEX_URL, loadComponent: () => import('./pokedex/pokedex.component').then(mod => mod.PokedexComponent) },
-    { path: '', redirectTo: Constants.POKEDEX_URL, pathMatch: 'full'}
+    { path: Constants.POKEDEX_ROUTE, loadComponent: () => import('./pokedex/pokedex.component').then(mod => mod.PokedexComponent) },
+    { path: '', redirectTo: Constants.POKEDEX_ROUTE, pathMatch: 'full'}
 ];
 
 @NgModule({
