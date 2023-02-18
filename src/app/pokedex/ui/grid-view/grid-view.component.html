@@ -1,9 +1,10 @@
 <div class="grid-view-container">
-
   <mat-card *ngFor="let pokemon of pokemonList" class="pokecard">
     <img src="{{pokemon.sprite}}"/>
     <p>{{ pokemon.name | titlecase }}</p>
     <app-pokemon-type-tag [types]="pokemon.types"></app-pokemon-type-tag>
   </mat-card>
-
 </div>
+<button mat-raised-button (click)="onLoadMoreClick()" class="load-more-button" *ngIf="loadMoreVisible">
+  Load More
+</button>

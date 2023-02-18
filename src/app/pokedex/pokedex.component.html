@@ -1,3 +1,7 @@
 <div class="page-section-container">
-  <app-grid-view [pokemonList]="(pokeApi.getPokemonList() | async) || []"></app-grid-view>
+  <app-grid-view
+    [pokemonList]="(pokemonListState$ | async)!.content"
+    [loadMoreVisible]="!(lastPage$ | async)!"
+    (loadMore)="onLoadMorePokemon()"
+  ></app-grid-view>
 </div>

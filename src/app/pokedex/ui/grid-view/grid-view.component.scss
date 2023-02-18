@@ -1,6 +1,4 @@
 .grid-view-container {
-  overflow-y: auto;
-  height: calc((100vh - 3rem)*0.8 - 2rem);
   width: 100%;
 
   display: grid;
@@ -25,4 +23,9 @@
   p {
     font-size: 1.25rem;
   }
+}
+
+.load-more-button {
+  margin-top: 1rem;
+  width: 100%;
 }

@@ -15,6 +15,12 @@ body {
 }
 
 .page-section-container {
-    height: 100%;
     padding: 1rem;
+    height: calc((100vh - 3rem)*0.8);
+    overflow-y: auto;
+}
+
+.header-footer-section-container {
+    padding: 1rem;
+    height: 100%;
 }
