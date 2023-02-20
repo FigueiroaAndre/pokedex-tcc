@@ -2,26 +2,28 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.1.5.
 
-## Development server
+## Tests
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+For each class that have been implemented in the declarative style with Rxjs, the same tests are being done at least three times but using diferent strategies:
 
-## Code scaffolding
+- Subscribing: The tests focuses on using the subscribe method of [RxJS Observables](https://rxjs.dev/api/index/class/Observable) to test
+- Marble: The tests focuses on using [Marble Diagrams](https://rxjs.dev/guide/testing/marble-testing) to test
+- Observer-spy: The tests focuses on using [observer-spy library](https://github.com/hirezio/observer-spy) to test
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Files with the extension `subscribing.spec.ts` represents unit tests using the `Subscribing` strategy
 
-## Build
+Files with the extension `marble.spec.ts` represents unit tests using the `Marble` strategy
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Files with the extension `observer-spy.spec.ts` represents unit tests using the `Observer-spy` strategy
 
-## Running unit tests
+Files with just the extension `spec.ts` represents unit tests where these strategies are not appliable.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Commands
 
-## Running end-to-end tests
+- `npm run test` - Run all tests of the application, regardless of its strategy
+- `npm run test:subscribing` - Run all tests of the application that uses `Subscribing` strategy
+- `npm run test:marble` - Run all tests of the application that uses `Marble` strategy
+- `npm run test:observer-spy` - Run all tests of the application that uses `Observer-spy` strategy
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+For each of these commands the suffix `:watch` can be added to rerun the tests whenever the files of the source code changes.
+For instance, the command `npm run test:marble:watch` runs all tests of the application that uses `Marble` strategy whenever the source code of the application changes.

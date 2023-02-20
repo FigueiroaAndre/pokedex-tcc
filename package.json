@@ -6,7 +6,14 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test --watch false --code-coverage",
+    "test:watch": "ng test --watch --code-coverage",
+    "test:subscribing": "ng test --watch false --code-coverage --include **/*.subscribing.spec.ts",
+    "test:subscribing:watch": "ng test --watch --code-coverage --include **/*.subscribing.spec.ts",
+    "test:marble": "ng test --watch false --code-coverage --include **/*.marble.spec.ts",
+    "test:marble:watch": "ng test --watch --code-coverage --include **/*.marble.spec.ts",
+    "test:observer-spy": "ng test --watch false --code-coverage --include **/*.observer-spy.spec.ts",
+    "test:observer-spy:watch": "ng test --watch --code-coverage --include **/*.observer-spy.spec.ts"
   },
   "private": true,
   "dependencies": {
@@ -28,8 +35,10 @@
     "@angular-devkit/build-angular": "^15.1.5",
     "@angular/cli": "~15.1.5",
     "@angular/compiler-cli": "^15.1.0",
+    "@hirez_io/observer-spy": "^2.2.0",
     "@types/jasmine": "~4.3.0",
     "jasmine-core": "~4.5.0",
+    "jasmine-marbles": "^0.9.2",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.2.0",

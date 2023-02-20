@@ -1,0 +1,31 @@
+.grid-view-container {
+  width: 100%;
+
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.pokecard {
+  height: 250px;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  img {
+    width: 100px;
+    height: 100px;
+  }
+
+  p {
+    font-size: 1.25rem;
+  }
+}
+
+.load-more-button {
+  margin-top: 1rem;
+  width: 100%;
+}

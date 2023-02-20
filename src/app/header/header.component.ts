@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
-import { Constants } from '../shared/constants';
+import { ROUTES } from '../app-routing.module';
 
 @Component({
   selector: 'app-header',
@@ -14,9 +14,9 @@ import { Constants } from '../shared/constants';
 })
 export class HeaderComponent {
 
-    constructor(private router: Router) {}
+  constructor(private router: Router) {}
 
-    navigateToPokedex(): void {
-        this.router.navigate([Constants.POKEDEX_URL])
-    }
+  navigateToPokedex(): void {
+    this.router.navigate([ROUTES.POKEDEX_ROUTE])
+  }
 }

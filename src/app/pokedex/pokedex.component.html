@@ -1,1 +1,7 @@
-<p>pokedex works!</p>
+<div class="page-section-container">
+  <app-grid-view
+    [pokemonList]="(pokemonListState$ | async)!.content"
+    [loadMoreVisible]="!(lastPage$ | async)!"
+    (loadMore)="onLoadMorePokemon()"
+  ></app-grid-view>
+</div>

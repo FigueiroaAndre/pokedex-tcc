@@ -1,10 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Constants } from './shared/constants';
+
+export const ROUTES = {
+  POKEDEX_ROUTE: 'pokedex'
+}
 
 const routes: Routes = [
-    { path: Constants.POKEDEX_URL, loadComponent: () => import('./pokedex/pokedex.component').then(mod => mod.PokedexComponent) },
-    { path: '', redirectTo: Constants.POKEDEX_URL, pathMatch: 'full'}
+    { path: ROUTES.POKEDEX_ROUTE, loadComponent: () => import('./pokedex/pokedex.component').then(mod => mod.PokedexComponent) },
+    { path: '', redirectTo: ROUTES.POKEDEX_ROUTE, pathMatch: 'full'}
 ];
 
 @NgModule({
