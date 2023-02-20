@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { GridViewComponent } from './ui/grid-view/grid-view.component';
 import { PokeApiService } from '../shared/data-access/poke-api.service';
-import { BehaviorSubject, last, map, Observable, scan, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, scan, switchMap, tap } from 'rxjs';
 import { Pokemon } from '../shared/models/pokemon.model';
 import { ListResult } from '../shared/models/list-result.model';
 
@@ -14,13 +14,14 @@ import { ListResult } from '../shared/models/list-result.model';
   templateUrl: './pokedex.component.html',
   styleUrls: ['./pokedex.component.scss']
 })
-export class PokedexComponent {
+export class PokedexComponent implements OnInit {
   private currentPage$ = new BehaviorSubject<number>(0);
   protected pokemonListState$: Observable<ListResult<Pokemon>>;
   protected lastPage$: Observable<boolean>;
 
-  constructor(private pokeApi: PokeApiService) {    
-
+  constructor(private pokeApi: PokeApiService) {} 
+  
+  ngOnInit(): void {   
     this.pokemonListState$ = this.currentPage$.pipe(
       switchMap(page => this.pokeApi.getPokemonList(page)),
       scan(
