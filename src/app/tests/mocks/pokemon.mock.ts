@@ -11,7 +11,7 @@ export function createPokemonMock(id: number, types: PokemonType[]): Pokemon {
   }
 }
 
-export function createPokemonListMock(amount: number, startFrom: number = 1): Pokemon[] {
+export function createPokemonListMock(amount: number = 20, startFrom: number = 1): Pokemon[] {
   return Array(amount)
     .fill(1)
     .map((_,index) => createPokemonMock(index + startFrom, createPokemonTypeArray(['grass'])));

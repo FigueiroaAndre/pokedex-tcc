@@ -2,34 +2,36 @@ import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs';
-import { PokeApiService } from '../shared/data-access/poke-api.service';
+import { BehaviorSubject, of } from 'rxjs';
 import { createPokemonListMock } from '../tests/mocks/pokemon.mock';
 
 import { PokedexComponent } from './pokedex.component';
+import { PokedexStore } from './pokedex.store';
 
-const pageTestSize = 5;
-const firstPageOfPokemonData = createPokemonListMock(pageTestSize);
-const secondPageOfPokemonData = createPokemonListMock(pageTestSize, 1 + pageTestSize);
+const pokemonListMock = createPokemonListMock();
 
 describe('PokedexComponent', () => {
   let component: PokedexComponent;
   let fixture: ComponentFixture<PokedexComponent>;
-  let pokeApiServiceSpy = jasmine.createSpyObj<PokeApiService>(['getPokemonList']);
+  let lastPageMock = new BehaviorSubject<boolean>(false);
+  let pokedexStoreSpy = jasmine.createSpyObj<PokedexStore>(['loadNextPage'],{
+    lastPage$: lastPageMock.asObservable(),
+    pokemonList$: of(pokemonListMock)
+  });
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ PokedexComponent ],
-      providers: [
-        {
-          provide: PokeApiService,
-          useValue: pokeApiServiceSpy
-        }
-      ]
+      imports: [ PokedexComponent ]
     })
     .overrideComponent(PokedexComponent, {
       set: {
         imports: [CommonModule],
+        providers: [
+          {
+            provide: PokedexStore,
+            useValue: pokedexStoreSpy
+          }
+        ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       }
     })
@@ -37,11 +39,7 @@ describe('PokedexComponent', () => {
 
     fixture = TestBed.createComponent(PokedexComponent);
     component = fixture.componentInstance;
-  });
-
-  beforeEach(() => {
-    pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: false, content: firstPageOfPokemonData }));
-    pokeApiServiceSpy.getPokemonList.calls.reset();
+    lastPageMock.next(false);
     fixture.detectChanges();
   });
 
@@ -49,36 +47,29 @@ describe('PokedexComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be able to load the first page of pokemons', () => {
+  it('should be able to render pokemon list', () => {
     const gridViewComponent = fixture.debugElement.query(By.css('app-grid-view'));
 
-    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0);
-    expect(gridViewComponent.properties['pokemonList']).toEqual(firstPageOfPokemonData);
+    expect(gridViewComponent.properties['pokemonList']).toEqual(pokemonListMock);
   });
 
   it('should be able to load next page of pokemons when loadMore event are triggered by GridViewComponent', () => {
     const gridViewComponent = fixture.debugElement.query(By.css('app-grid-view'));
-    pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: false, content: secondPageOfPokemonData }))
+    pokedexStoreSpy.loadNextPage.and.callFake(() => {});
     
     gridViewComponent.triggerEventHandler('loadMore');
-    fixture.detectChanges();
     
-    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0);
-    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(1);
-    expect(gridViewComponent.properties['pokemonList']).toEqual([...firstPageOfPokemonData, ...secondPageOfPokemonData]);
-    expect(gridViewComponent.properties['loadMoreVisible']).toBeTrue();
+    expect(pokedexStoreSpy.loadNextPage).toHaveBeenCalled();
   });
 
-  it('should be able to detect last pages of data', () => {
-    const gridViewComponent = fixture.debugElement.query(By.css('app-grid-view'));
-    pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: true, content: secondPageOfPokemonData }));
+  it('should be able to toggle loadMoreVisible', () => {
+    let gridViewComponent = fixture.debugElement.query(By.css('app-grid-view'));
+    expect(gridViewComponent.properties['loadMoreVisible']).toBeTrue();
 
-    gridViewComponent.triggerEventHandler('loadMore');
+    lastPageMock.next(true);
     fixture.detectChanges();
 
-    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0);
-    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(1);
-    expect(gridViewComponent.properties['pokemonList']).toEqual([...firstPageOfPokemonData, ...secondPageOfPokemonData]);
+    gridViewComponent = fixture.debugElement.query(By.css('app-grid-view'));
     expect(gridViewComponent.properties['loadMoreVisible']).toBeFalse();
   });
 
