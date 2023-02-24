@@ -12,8 +12,6 @@ export const POKEMON_MAX_AMOUNT = 151;
 })
 export class PokeApiService {
 
-  constructor() { }
-
   getPokemonList(page: number = 0): Observable<ListResult<Pokemon>> {
     return of(PokemonDataJson as Pokemon[]).pipe(
       map<Pokemon[], ListResult<Pokemon>>(pokemonList => ({
