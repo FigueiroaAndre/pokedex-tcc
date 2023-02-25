@@ -12,11 +12,16 @@ export const POKEMON_MAX_AMOUNT = 151;
 })
 export class PokeApiService {
 
-  getPokemonList(page: number = 0): Observable<ListResult<Pokemon>> {
+  getPokemonList(page: number = 0, searchText: string = ''): Observable<ListResult<Pokemon>> {
     return of(PokemonDataJson as Pokemon[]).pipe(
-      map<Pokemon[], ListResult<Pokemon>>(pokemonList => ({
-        last: PAGE_SIZE * page + PAGE_SIZE >= POKEMON_MAX_AMOUNT,
-        content: pokemonList.slice(PAGE_SIZE * page, PAGE_SIZE * page + PAGE_SIZE)
-      })));
+      map<Pokemon[], ListResult<Pokemon>>(pokemonList => {
+        const filteredList = pokemonList.filter(pkm => pkm.name.toLowerCase().includes(searchText.toLowerCase()));
+        const maxAmount = filteredList.length;
+        return {
+          last: PAGE_SIZE * page + PAGE_SIZE >= maxAmount,
+          content: filteredList.slice(PAGE_SIZE * page, PAGE_SIZE * page + PAGE_SIZE)
+        }
+      }
+    ));
   }
 }

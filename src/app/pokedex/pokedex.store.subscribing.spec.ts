@@ -34,8 +34,9 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     const state$ = service.select(state => state);
 
     subscription = state$.subscribe(state => {
-      expect(state.currentPage).toBe(0);
-      expect(state.lastPage).toBe(false);
+      expect(state.fetchData.currentPage).toBe(0);
+      expect(state.fetchData.lastPage).toBe(false);
+      expect(state.fetchData.searchText).toBe('');
       expect(state.pokemonList).toEqual(firstPageOfPokemonData);
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalled();
@@ -49,8 +50,9 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     service.loadNextPage();
 
     subscription = state$.subscribe(state => {
-      expect(state.currentPage).toBe(1);
-      expect(state.lastPage).toBe(true);
+      expect(state.fetchData.currentPage).toBe(1);
+      expect(state.fetchData.lastPage).toBe(true);
+      expect(state.fetchData.searchText).toBe('');
       expect(state.pokemonList).toEqual([...firstPageOfPokemonData, ...secondPageOfPokemonData]);
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(2);
@@ -64,10 +66,28 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     service.loadNextPage();
 
     subscription = state$.subscribe(state => {
-      expect(state.currentPage).toBe(1);
-      expect(state.lastPage).toBe(true);
+      expect(state.fetchData.currentPage).toBe(1);
+      expect(state.fetchData.lastPage).toBe(true);
+      expect(state.fetchData.searchText).toBe('');
       expect(state.pokemonList).toEqual([...firstPageOfPokemonData]);
     })
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(1);
+  });
+
+  it('should be able to fetch data by search text', () => {
+    service = TestBed.inject(PokedexStore);
+    const state$ = service.select(state => state);
+    const searchStream$ = of('test1','test2','test3');
+
+    service.searchPokemon(searchStream$);
+
+    subscription = state$.subscribe(state => {
+      expect(state.fetchData.currentPage).toBe(0);
+      expect(state.fetchData.searchText).toBe('test3');
+    });
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(4);
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test1');
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test2');
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test3');
   });
 });

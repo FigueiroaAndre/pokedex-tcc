@@ -1,4 +1,7 @@
 <div class="page-section-container">
+  <mat-form-field class="search-bar" appearance="fill">
+    <input matInput [formControl]="searchControl" placeholder="Search pokemon..." value="Sushi">
+  </mat-form-field>
   <app-grid-view 
     [pokemonList]="(pokemonList$ | async)!"
     [loadMoreVisible]="!(lastPage$ | async)!"
