@@ -33,9 +33,12 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
     const stateSpy = subscribeSpyTo(service.select(state => state));
 
     expect(stateSpy.getLastValue()).toEqual({
-      currentPage: 0,
       pokemonList: firstPageOfPokemonData,
-      lastPage: false      
+      fetchData: {
+        currentPage: 0,
+        lastPage: false,
+        searchText: ''
+      }
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalled();
   });
@@ -48,9 +51,12 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
     service.loadNextPage();
 
     expect(stateSpy.getLastValue()).toEqual({
-      currentPage: 1,
       pokemonList: [...firstPageOfPokemonData, ...secondPageOfPokemonData],
-      lastPage: true     
+      fetchData: {
+        currentPage: 1,
+        lastPage: true,
+        searchText: ''
+      }
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(2);
   });
@@ -63,10 +69,28 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
     service.loadNextPage();
 
     expect(stateSpy.getLastValue()).toEqual({
-      currentPage: 1,
       pokemonList: firstPageOfPokemonData,
-      lastPage: true     
+      fetchData: {
+        currentPage: 1,
+        lastPage: true,     
+        searchText: ''
+      }
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(1);
+  });
+
+  it('should be able to fetch data by search text', () => {
+    service = TestBed.inject(PokedexStore);
+    const searchStream$ = of('test1','test2','test3');
+    const stateSpy = subscribeSpyTo(service.select(state => state));
+
+    service.searchPokemon(searchStream$);
+
+    expect(stateSpy.getLastValue()?.fetchData.currentPage).toEqual(0);
+    expect(stateSpy.getLastValue()?.fetchData.searchText).toEqual('test3');
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(4);
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test1');
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test2');
+    expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test3');
   });
 });

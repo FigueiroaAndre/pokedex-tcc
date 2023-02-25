@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { BehaviorSubject, of } from 'rxjs';
 import { createPokemonListMock } from '../tests/mocks/pokemon.mock';
@@ -14,7 +15,7 @@ describe('PokedexComponent', () => {
   let component: PokedexComponent;
   let fixture: ComponentFixture<PokedexComponent>;
   let lastPageMock = new BehaviorSubject<boolean>(false);
-  let pokedexStoreSpy = jasmine.createSpyObj<PokedexStore>(['loadNextPage'],{
+  let pokedexStoreSpy = jasmine.createSpyObj<PokedexStore>(['loadNextPage', 'searchPokemon'],{
     lastPage$: lastPageMock.asObservable(),
     pokemonList$: of(pokemonListMock)
   });
@@ -25,7 +26,7 @@ describe('PokedexComponent', () => {
     })
     .overrideComponent(PokedexComponent, {
       set: {
-        imports: [CommonModule],
+        imports: [CommonModule, ReactiveFormsModule],
         providers: [
           {
             provide: PokedexStore,
