@@ -1,50 +1,83 @@
 import { Injectable } from "@angular/core";
 import { ComponentStore } from "@ngrx/component-store";
-import { concatMap, distinctUntilChanged, filter, Observable, tap } from "rxjs";
+import { concatMap, distinctUntilChanged, filter, map, Observable, tap } from "rxjs";
+import { isEqual } from 'lodash-es';
 import { PokeApiService } from "../shared/data-access/poke-api.service";
 import { ListResult } from "../shared/models/list-result.model";
 import { Pokemon } from "../shared/models/pokemon.model";
 
 export interface PokedexState {
   pokemonList: Pokemon[];
+  fetchData: PokeApiEffectData;
+}
+
+interface PokeApiEffectData {
   currentPage: number;
   lastPage: boolean;
-}
+  searchText: string;
+};
 
 @Injectable()
 export class PokedexStore extends ComponentStore<PokedexState> {
   readonly pokemonList$ = this.select(state => state.pokemonList);
-  readonly lastPage$ = this.select(state => state.lastPage);
-  private readonly currentPage$ = this.select(state => state.currentPage);
-  private readonly fetchPokemonsData$ = this.select({
-    lastPage: this.lastPage$,
-    currentPage: this.currentPage$
-  }).pipe(distinctUntilChanged());
+  private readonly fetchData$ = this.select(state => state.fetchData);
+  readonly lastPage$ = this.fetchData$.pipe(map(data => data.lastPage));
 
   constructor(private readonly pokeApi: PokeApiService) {
     super({
       pokemonList: [],
-      currentPage: 0,
-      lastPage: false
+      fetchData: {
+        currentPage: 0,
+        lastPage: false,
+        searchText: ''
+      }
     });
-    this.fetchPokemons(this.fetchPokemonsData$);
+    this.fetchPokemons(this.fetchData$.pipe(distinctUntilChanged((a,b) => isEqual(a,b))));
   }
 
-  readonly fetchPokemons = this.effect((fetchData: Observable<{ lastPage: boolean, currentPage: number}>) => fetchData.pipe(
+  readonly loadNextPage = this.updater(state => ({
+    ...state,
+    fetchData: {
+      ...state.fetchData,
+      currentPage: state.fetchData.currentPage + 1
+    }
+  }));
+
+  readonly searchPokemon = this.updater((state, searchText: string) => ({
+    pokemonList: [],
+    fetchData: {
+      currentPage: 0,
+      lastPage: false,
+      searchText: searchText
+    }
+  }));
+
+  private readonly fetchPokemons = this.effect((data$: Observable<PokeApiEffectData>) => data$.pipe(
     filter(fetchData => !fetchData.lastPage),
-    concatMap(fetchData => this.pokeApi.getPokemonList(fetchData.currentPage).pipe(tap(result => this.addPokemons(result)))),
+    concatMap(fetchData => this.pokeApi.getPokemonList(fetchData.currentPage, fetchData.searchText)
+      .pipe(tap(result => {
+        if (fetchData.currentPage === 0) {
+          this.setPokemonList(result);
+        } else {
+          this.addPokemonsToList(result);
+        }
+      }))),
   ));
 
-  readonly loadNextPage = this.updater(state => {
-    return {...state,
-      currentPage: state.currentPage + 1}
-      
-  });
+  private addPokemonsToList = this.updater((state, pokemonListResult: ListResult<Pokemon>) => ({
+    pokemonList: [...state.pokemonList, ...pokemonListResult.content],
+    fetchData: {
+      ...state.fetchData,
+      lastPage: pokemonListResult.last
+    }
+  }));
 
-  private addPokemons = this.updater((state, pokemonListResult: ListResult<Pokemon>) => ({
-    ...state,
-    lastPage: pokemonListResult.last,
-    pokemonList: [...state.pokemonList, ...pokemonListResult.content]
+  private setPokemonList = this.updater((state, pokemonListResult: ListResult<Pokemon>) => ({
+    pokemonList: pokemonListResult.content,
+    fetchData: {
+      ...state.fetchData,
+      lastPage: pokemonListResult.last
+    }
   }));
   
 }
