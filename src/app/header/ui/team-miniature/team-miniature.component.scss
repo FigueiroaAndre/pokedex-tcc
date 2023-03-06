@@ -1,0 +1,25 @@
+:host {
+  height: 100%;
+}
+
+.team-miniature-container {
+  height: 100%;
+  
+  display: grid;
+  gap: 0.5rem;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.miniature-card {  
+  padding: 0.25rem;
+  width: 100%;
+  height: 100%;
+  background: '../../../../assets/images/pokeball-bg.png';
+
+
+  img {
+    height: 3rem;
+    width: 3rem;
+  }
+}

@@ -5,11 +5,12 @@ import PokemonDataJson from './pokemon-data.json';
 
 describe('PokeApiService (SUBSCRIBING)', () => {
   let service: PokeApiService;
-  let subscription: Subscription;
+  let subscription: Subscription | null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(PokeApiService);
+    subscription = null;
   });
 
   afterEach(() => {

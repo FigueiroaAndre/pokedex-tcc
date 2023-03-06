@@ -1,5 +1,13 @@
 <div class="grid-view-container">
   <mat-card *ngFor="let pokemon of pokemonList" class="pokecard">
+    <button *ngIf="!isPokemonInTeam(pokemon); else removePokemonButton" mat-icon-button color="primary" (click)="onAddClick(pokemon)">
+      <mat-icon>add</mat-icon>
+    </button>
+    <ng-template #removePokemonButton>
+      <button mat-icon-button color="primary" (click)="onRemoveClick(pokemon)">
+        <mat-icon>remove</mat-icon>
+      </button>
+    </ng-template>
     <img src="{{pokemon.sprite}}"/>
     <p>{{ pokemon.name | titlecase }}</p>
     <app-pokemon-type-tag [types]="pokemon.types"></app-pokemon-type-tag>

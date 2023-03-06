@@ -15,6 +15,10 @@
   justify-content: center;
   gap: 0.5rem;
 
+  button {
+    align-self: flex-end;
+  }
+
   img {
     width: 100px;
     height: 100px;
