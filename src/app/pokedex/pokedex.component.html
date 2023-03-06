@@ -3,8 +3,11 @@
     <input matInput [formControl]="searchControl" placeholder="Search pokemon..." value="Sushi">
   </mat-form-field>
   <app-grid-view 
-    [pokemonList]="(pokemonList$ | async)!"
-    [loadMoreVisible]="!(lastPage$ | async)!"
-    (loadMore)="onLoadMorePokemon()"
+  [pokemonList]="(pokemonList$ | async)!"
+  [loadMoreVisible]="!(lastPage$ | async)!"
+  [team]="(team$ | async)!"
+  (loadMore)="onLoadMorePokemon()"
+  (addPokemonToTeam)="onAddPokemonToTeam($event)"
+  (removePokemonFromTeam)="onRemovePokemonFromTeam($event)"
   ></app-grid-view>
 </div>

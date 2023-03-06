@@ -11,7 +11,7 @@ const secondPageOfPokemonData = createPokemonListMock(20, 21);
 describe('PokedexStore (MARBLE)', () => {
   let service: PokedexStore;
   let pokeApiServiceSpy = jasmine.createSpyObj<PokeApiService>(['getPokemonList']);
-  let subscription: Subscription;
+  let subscription: Subscription | null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -26,6 +26,7 @@ describe('PokedexStore (MARBLE)', () => {
 
   beforeEach(() => {
     pokeApiServiceSpy.getPokemonList.calls.reset();
+    subscription = null;
   })
 
 

@@ -1,0 +1,5 @@
+<div class="team-miniature-container">
+  <mat-card *ngFor="let pokemon of miniatureTeamArray()" class="miniature-card">
+    <img src="{{pokemon ? pokemon.sprite : '../../../../assets/images/pokeball-bg.png'}}" class="miniature-image">
+  </mat-card>
+</div>

@@ -9,7 +9,7 @@ const secondPageOfPokemonData = createPokemonListMock(20, 21);
 
 describe('PokedexStore (SUBSCRIBING)', () => {
   let service: PokedexStore;
-  let subscription: Subscription;
+  let subscription: Subscription | null;
   let pokeApiServiceSpy = jasmine.createSpyObj<PokeApiService>(['getPokemonList']);
 
   beforeEach(() => {
@@ -21,6 +21,7 @@ describe('PokedexStore (SUBSCRIBING)', () => {
         useValue: pokeApiServiceSpy
       }]
     });
+    subscription = null;
     pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: false, content: firstPageOfPokemonData }));
     pokeApiServiceSpy.getPokemonList.calls.reset();
   });
