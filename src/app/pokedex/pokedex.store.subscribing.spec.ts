@@ -1,4 +1,5 @@
 import { TestBed } from "@angular/core/testing";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { of, Subscription } from "rxjs";
 import { PokeApiService } from "../shared/data-access/poke-api.service";
 import { createPokemonListMock } from "../tests/mocks/pokemon.mock";
@@ -11,6 +12,7 @@ describe('PokedexStore (SUBSCRIBING)', () => {
   let service: PokedexStore;
   let subscription: Subscription | null;
   let pokeApiServiceSpy = jasmine.createSpyObj<PokeApiService>(['getPokemonList']);
+  let matSnackBarSpy = jasmine.createSpyObj<MatSnackBar>(['open']);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -19,7 +21,12 @@ describe('PokedexStore (SUBSCRIBING)', () => {
       {
         provide: PokeApiService,
         useValue: pokeApiServiceSpy
-      }]
+      },
+      {
+        provide: MatSnackBar,
+        useValue: matSnackBarSpy
+      }
+    ]
     });
     subscription = null;
     pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: false, content: firstPageOfPokemonData }));
@@ -35,9 +42,9 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     const state$ = service.select(state => state);
 
     subscription = state$.subscribe(state => {
-      expect(state.fetchData.currentPage).toBe(0);
-      expect(state.fetchData.lastPage).toBe(false);
-      expect(state.fetchData.searchText).toBe('');
+      expect(state.apiTrigger.currentPage).toBe(0);
+      expect(state.apiTrigger.lastPage).toBe(false);
+      expect(state.apiTrigger.searchText).toBe('');
       expect(state.pokemonList).toEqual(firstPageOfPokemonData);
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalled();
@@ -51,9 +58,9 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     service.loadNextPage();
 
     subscription = state$.subscribe(state => {
-      expect(state.fetchData.currentPage).toBe(1);
-      expect(state.fetchData.lastPage).toBe(true);
-      expect(state.fetchData.searchText).toBe('');
+      expect(state.apiTrigger.currentPage).toBe(1);
+      expect(state.apiTrigger.lastPage).toBe(true);
+      expect(state.apiTrigger.searchText).toBe('');
       expect(state.pokemonList).toEqual([...firstPageOfPokemonData, ...secondPageOfPokemonData]);
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(2);
@@ -67,9 +74,9 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     service.loadNextPage();
 
     subscription = state$.subscribe(state => {
-      expect(state.fetchData.currentPage).toBe(1);
-      expect(state.fetchData.lastPage).toBe(true);
-      expect(state.fetchData.searchText).toBe('');
+      expect(state.apiTrigger.currentPage).toBe(1);
+      expect(state.apiTrigger.lastPage).toBe(true);
+      expect(state.apiTrigger.searchText).toBe('');
       expect(state.pokemonList).toEqual([...firstPageOfPokemonData]);
     })
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(1);
@@ -83,8 +90,8 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     service.searchPokemon(searchStream$);
 
     subscription = state$.subscribe(state => {
-      expect(state.fetchData.currentPage).toBe(0);
-      expect(state.fetchData.searchText).toBe('test3');
+      expect(state.apiTrigger.currentPage).toBe(0);
+      expect(state.apiTrigger.searchText).toBe('test3');
     });
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(4);
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test1');

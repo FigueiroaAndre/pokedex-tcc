@@ -1,0 +1,19 @@
+:host {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+}
+
+img {
+  width: 8rem;
+  height: 8rem;
+}
+
+p {
+  font-size: 1.5rem;
+}

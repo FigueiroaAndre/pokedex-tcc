@@ -21,7 +21,8 @@ describe('PokedexComponent', () => {
   let lastPageMock = new BehaviorSubject<boolean>(false);
   let pokedexStoreSpy = jasmine.createSpyObj<PokedexStore>(['loadNextPage', 'searchPokemon'],{
     lastPage$: lastPageMock.asObservable(),
-    pokemonList$: of(pokemonListMock)
+    pokemonList$: of(pokemonListMock),
+    requestStatus$: of('pending')
   });
   let gridViewComponent: DebugElement;
   const initialState: AppState = {

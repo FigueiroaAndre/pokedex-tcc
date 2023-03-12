@@ -1,4 +1,5 @@
 import { TestBed } from "@angular/core/testing";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { autoUnsubscribe, subscribeSpyTo } from "@hirez_io/observer-spy";
 import { of, Subscription } from "rxjs";
 import { PokeApiService } from "../shared/data-access/poke-api.service";
@@ -11,6 +12,7 @@ const secondPageOfPokemonData = createPokemonListMock(20, 21);
 describe('PokedexStore (OBSERVER-SPY)', () => {
   let service: PokedexStore;
   let pokeApiServiceSpy = jasmine.createSpyObj<PokeApiService>(['getPokemonList']);
+  let matSnackBarSpy = jasmine.createSpyObj<MatSnackBar>(['open']);
 
   autoUnsubscribe();
 
@@ -21,7 +23,12 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
       {
         provide: PokeApiService,
         useValue: pokeApiServiceSpy
-      }]
+      },
+      {
+        provide: MatSnackBar,
+        useValue: matSnackBarSpy
+      }
+    ]
     });
     pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: false, content: firstPageOfPokemonData }));
     pokeApiServiceSpy.getPokemonList.calls.reset();
@@ -34,7 +41,9 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
 
     expect(stateSpy.getLastValue()).toEqual({
       pokemonList: firstPageOfPokemonData,
-      fetchData: {
+      requestStatus: 'success',
+      apiTrigger: {
+        requestRetryCount: 0,
         currentPage: 0,
         lastPage: false,
         searchText: ''
@@ -52,7 +61,9 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
 
     expect(stateSpy.getLastValue()).toEqual({
       pokemonList: [...firstPageOfPokemonData, ...secondPageOfPokemonData],
-      fetchData: {
+      requestStatus: 'success',
+      apiTrigger: {
+        requestRetryCount: 0,
         currentPage: 1,
         lastPage: true,
         searchText: ''
@@ -70,7 +81,9 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
 
     expect(stateSpy.getLastValue()).toEqual({
       pokemonList: firstPageOfPokemonData,
-      fetchData: {
+      requestStatus: 'success',
+      apiTrigger: {
+        requestRetryCount: 0,
         currentPage: 1,
         lastPage: true,     
         searchText: ''
@@ -86,8 +99,8 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
 
     service.searchPokemon(searchStream$);
 
-    expect(stateSpy.getLastValue()?.fetchData.currentPage).toEqual(0);
-    expect(stateSpy.getLastValue()?.fetchData.searchText).toEqual('test3');
+    expect(stateSpy.getLastValue()?.apiTrigger.currentPage).toEqual(0);
+    expect(stateSpy.getLastValue()?.apiTrigger.searchText).toEqual('test3');
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledTimes(4);
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test1');
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test2');

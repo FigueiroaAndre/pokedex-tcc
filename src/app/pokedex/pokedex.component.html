@@ -1,13 +1,20 @@
-<div class="page-section-container">
-  <mat-form-field class="search-bar" appearance="fill">
-    <input matInput [formControl]="searchControl" placeholder="Search pokemon..." value="Sushi">
-  </mat-form-field>
-  <app-grid-view 
-  [pokemonList]="(pokemonList$ | async)!"
-  [loadMoreVisible]="!(lastPage$ | async)!"
-  [team]="(team$ | async)!"
-  (loadMore)="onLoadMorePokemon()"
-  (addPokemonToTeam)="onAddPokemonToTeam($event)"
-  (removePokemonFromTeam)="onRemovePokemonFromTeam($event)"
-  ></app-grid-view>
+<div class="page-section-container" *ngIf="vm$ | async as vm">
+  <app-loader *ngIf="vm.isLoading"></app-loader>
+
+  <ng-container *ngIf="!vm.isLoading && !vm.hasLastRequestFailed">
+    <mat-form-field class="search-bar" appearance="fill">
+      <input matInput [formControl]="searchControl" placeholder="Search pokemon..." value="Sushi">
+    </mat-form-field>
+    <app-grid-view 
+    [pokemonList]="vm.pokemonList"
+    [loadMoreVisible]="!vm.lastPage"
+    [team]="vm.team"
+    (loadMore)="onLoadMorePokemon()"
+    (addPokemonToTeam)="onAddPokemonToTeam($event)"
+    (removePokemonFromTeam)="onRemovePokemonFromTeam($event)"
+    ></app-grid-view>
+  </ng-container>
+
+  <app-pokedex-error-message *ngIf="!vm.isLoading && vm.hasLastRequestFailed" (tryAgain)="onTryAgain()">
+  </app-pokedex-error-message>
 </div>
