@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { subscribeSpyTo, autoUnsubscribe } from '@hirez_io/observer-spy';
+import { subscribeSpyTo } from '@hirez_io/observer-spy';
 import { LIST_POKEMON_URL, PokeApiService } from './poke-api.service';
 
 describe('PokeApiService (OBSERVER-SPY)', () => {
   let service: PokeApiService;
   let httpTestingController: HttpTestingController;
-  autoUnsubscribe();
 
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -3,7 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { autoUnsubscribe, subscribeSpyTo } from '@hirez_io/observer-spy';
+import { subscribeSpyTo } from '@hirez_io/observer-spy';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { Observable, of } from 'rxjs';
 import { AppState } from '../shared/state/app.state';
@@ -33,8 +33,6 @@ describe('PokedexComponent (OBSERVER-SPY)', () => {
   };
 
   const typeInSearch = (value: string) => dispatchNewInputValue(fixture, searchInput, value); 
-
-  autoUnsubscribe();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

@@ -1,7 +1,7 @@
 import { TestBed } from "@angular/core/testing";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { autoUnsubscribe, subscribeSpyTo } from "@hirez_io/observer-spy";
-import { of, Subscription } from "rxjs";
+import { subscribeSpyTo } from "@hirez_io/observer-spy";
+import { of } from "rxjs";
 import { PokeApiService } from "../shared/data-access/poke-api.service";
 import { createPokemonListMock } from "../tests/mocks/pokemon.mock";
 import { PokedexStore } from "./pokedex.store";
@@ -13,8 +13,6 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
   let service: PokedexStore;
   let pokeApiServiceSpy = jasmine.createSpyObj<PokeApiService>(['getPokemonList']);
   let matSnackBarSpy = jasmine.createSpyObj<MatSnackBar>(['open']);
-
-  autoUnsubscribe();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
