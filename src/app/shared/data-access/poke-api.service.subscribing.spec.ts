@@ -19,10 +19,6 @@ describe('PokeApiService (SUBSCRIBING)', () => {
 
   afterEach(() => {
     subscription?.unsubscribe();
-  })
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
   });
 
   it('should perform a request to retrieve list of pokemons from API', () => {
