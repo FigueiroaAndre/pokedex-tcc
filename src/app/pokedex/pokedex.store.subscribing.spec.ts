@@ -1,9 +1,10 @@
-import { TestBed } from "@angular/core/testing";
+import { fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { of, Subscription } from "rxjs";
 import { PokeApiService } from "../shared/data-access/poke-api.service";
+import { RequestStatus } from "../shared/models/request-status.model";
 import { createPokemonListMock } from "../tests/mocks/pokemon.mock";
-import { PokedexStore } from "./pokedex.store";
+import { PokedexState, PokedexStore } from "./pokedex.store";
 
 const firstPageOfPokemonData = createPokemonListMock(20);
 const secondPageOfPokemonData = createPokemonListMock(20, 21);
@@ -98,4 +99,39 @@ describe('PokedexStore (SUBSCRIBING)', () => {
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test2');
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test3');
   });
+
+  it('should be able to retry last request using same parameters, but incrementing the retry count by 1', () => {
+    service = TestBed.inject(PokedexStore);
+    const emittedValues: any[] = []; // x
+    const apiTrigger$ = service.select(state => state.apiTrigger);
+    subscription = apiTrigger$.subscribe(state => {
+      emittedValues.push(state);
+    });
+    
+    service.searchPokemon('test1');
+    pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: true, content: secondPageOfPokemonData }));
+    service.loadNextPage();
+    service.retryLastRequest();
+
+    const currentValue = emittedValues.slice(-1)[0];
+    const previousValue = emittedValues.slice(-2,-1)[0];
+    expect(currentValue).toEqual({
+      ...previousValue,
+      requestRetryCount: previousValue.requestRetryCount + 1
+    });
+  });
+
+  it('should be able to reset requestStatus to pending after 1 second', fakeAsync(() => {
+    service = TestBed.inject(PokedexStore);
+    const requestStatus = service.select(state => state.requestStatus);
+    const emittedStatus: RequestStatus[] = [];
+    subscription = requestStatus.subscribe(requestStatus => emittedStatus.push(requestStatus));
+
+    expect(emittedStatus.length).toBe(1);
+    tick(1000);
+    expect(emittedStatus.length).toBe(2);
+    expect(emittedStatus[0]).toBe('success');
+    expect(emittedStatus[1]).toBe('pending');
+
+  }));
 });

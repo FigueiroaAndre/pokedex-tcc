@@ -1,4 +1,5 @@
-import { TestBed } from "@angular/core/testing";
+import { state } from "@angular/animations";
+import { fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { subscribeSpyTo } from "@hirez_io/observer-spy";
 import { of } from "rxjs";
@@ -104,4 +105,32 @@ describe('PokedexStore (OBSERVER-SPY)', () => {
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test2');
     expect(pokeApiServiceSpy.getPokemonList).toHaveBeenCalledWith(0, 'test3');
   });
+
+  it('should be able to retry last request using same parameters, but incrementing the retry count by 1', () => {
+    service = TestBed.inject(PokedexStore);
+    const apiTriggerSpy = subscribeSpyTo(service.select(state => state.apiTrigger));
+    
+    service.searchPokemon('test1');
+    pokeApiServiceSpy.getPokemonList.and.returnValue(of({ last: true, content: secondPageOfPokemonData }));
+    service.loadNextPage();
+    service.retryLastRequest();
+
+    const currentValue = apiTriggerSpy.getLastValue()!;
+    const previousValue = apiTriggerSpy.getValueAt(apiTriggerSpy.getValuesLength() - 2);
+    expect(currentValue).toEqual({
+      ...previousValue,
+      requestRetryCount: previousValue.requestRetryCount + 1
+    });
+  });
+
+  it('should be able to reset requestStatus to pending after 1 second', fakeAsync(() => {
+    service = TestBed.inject(PokedexStore);
+    const requestStatusSpy = subscribeSpyTo(service.select(state => state.requestStatus));
+
+    expect(requestStatusSpy.getValuesLength()).toBe(1);
+    tick(1000);
+    expect(requestStatusSpy.getValuesLength()).toBe(2);
+    expect(requestStatusSpy.getValueAt(0)).toBe('success');
+    expect(requestStatusSpy.getValueAt(1)).toBe('pending');
+  }));
 });
