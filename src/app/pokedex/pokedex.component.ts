@@ -6,12 +6,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { GridViewComponent } from './ui/grid-view/grid-view.component';
 import { PokedexStore } from './pokedex.store';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, Observable } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, map, Observable, startWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { addPokemon, removePokemon } from '../shared/state/team/team.actions';
 import { AppState } from '../shared/state/app.state';
 import { Pokemon } from '../shared/models/pokemon.model';
 import { selectTeam } from '../shared/state/team/team.selectors';
+import { LoaderComponent } from '../shared/ui/loader/loader.component';
+import { PokedexErrorMessageComponent } from './ui/pokedex-error-message/pokedex-error-message.component';
+
+interface ViewModel {
+  lastPage: boolean;
+  pokemonList: Pokemon[];
+  hasLastRequestFailed: boolean;
+  isLoading: boolean;
+  team: Pokemon[];
+}
 
 @Component({
   selector: 'app-pokedex',
@@ -22,17 +32,26 @@ import { selectTeam } from '../shared/state/team/team.selectors';
     ReactiveFormsModule,
     MatInputModule,
     MatFormFieldModule,
-    GridViewComponent
+    GridViewComponent,
+    LoaderComponent,
+    PokedexErrorMessageComponent
   ],
   templateUrl: './pokedex.component.html',
   styleUrls: ['./pokedex.component.scss'],
   providers: [PokedexStore]
 })
 export class PokedexComponent {
-  protected lastPage$ = this.pokedexStore.lastPage$;
-  protected pokemonList$ = this.pokedexStore.pokemonList$;
+  private lastPage$ = this.pokedexStore.lastPage$;
+  private pokemonList$ = this.pokedexStore.pokemonList$;
+  private isLoading$ = this.pokedexStore.requestStatus$.pipe(map(requestStatus => requestStatus === 'processing'));
+  private hasLastRequestFailed$ = this.pokedexStore.requestStatus$.pipe(
+    filter(requestStatus => requestStatus === 'success' || requestStatus === 'error'),
+    map(requestStatus => requestStatus === 'error')
+  );
+  private team$: Observable<Pokemon[]>;
+
   protected searchControl = new FormControl('', { nonNullable: true });
-  protected team$: Observable<Pokemon[]>;
+  protected vm$: Observable<ViewModel>;
 
   constructor(private readonly pokedexStore: PokedexStore, private readonly store: Store<AppState>) {
     const searchUpdateTrigger$ = this.searchControl.valueChanges.pipe(
@@ -41,6 +60,13 @@ export class PokedexComponent {
     );
     this.pokedexStore.searchPokemon(searchUpdateTrigger$);
     this.team$ = this.store.select(selectTeam);
+    this.vm$ = combineLatest({
+      isLoading: this.isLoading$.pipe(startWith(false)),
+      hasLastRequestFailed: this.hasLastRequestFailed$.pipe(startWith(false)),
+      lastPage: this.lastPage$.pipe(startWith(false)),
+      pokemonList: this.pokemonList$.pipe(startWith([])),
+      team: this.team$.pipe(startWith([]))
+    });
   }
 
   protected onLoadMorePokemon(): void {
@@ -53,6 +79,10 @@ export class PokedexComponent {
 
   protected onRemovePokemonFromTeam(pokemon: Pokemon): void {
     this.store.dispatch(removePokemon({ id: pokemon.id }));
+  }
+
+  protected onTryAgain(): void {
+    this.pokedexStore.retryLastRequest();
   }
 
 }

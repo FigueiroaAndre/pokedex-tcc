@@ -1,14 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Subscription } from 'rxjs';
-import { PAGE_SIZE, PokeApiService, POKEMON_MAX_AMOUNT } from './poke-api.service';
-import PokemonDataJson from './pokemon-data.json';
+import { LIST_POKEMON_URL, PokeApiService } from './poke-api.service';
 
 describe('PokeApiService (SUBSCRIBING)', () => {
   let service: PokeApiService;
+  let httpTestingController: HttpTestingController;
   let subscription: Subscription | null;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(PokeApiService);
     subscription = null;
   });
@@ -21,12 +25,15 @@ describe('PokeApiService (SUBSCRIBING)', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should return observable with data retrieved from json file', () => {
-    subscription = service.getPokemonList().subscribe(pokemonList => {
-      expect(pokemonList).toEqual({
-        last: PAGE_SIZE >= POKEMON_MAX_AMOUNT,
-        content: PokemonDataJson.slice(0, PAGE_SIZE)
-      })
-    });
+  it('should perform a request to retrieve list of pokemons from API', () => {
+    const page = 5;
+    const searchText = 'Pikachu';
+    subscription = service.getPokemonList(page, searchText).subscribe();
+
+    const req = httpTestingController.match(request => request.url === LIST_POKEMON_URL)[0];
+
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('page')).toBe(page.toString());
+    expect(req.request.params.get('searchText')).toBe(searchText);
   })
 });

@@ -27,7 +27,8 @@ describe('PokedexComponent (MARBLE)', () => {
   let searchTrigger$: Observable<string>;
   let pokedexStoreSpy = jasmine.createSpyObj<PokedexStore>(['loadNextPage', 'searchPokemon'],{
     lastPage$: of(false),
-    pokemonList$: of(pokemonListMock)
+    pokemonList$: of(pokemonListMock),
+    requestStatus$: of('pending')
   });
   let gridViewComponent: DebugElement;
   const initialState: AppState = {

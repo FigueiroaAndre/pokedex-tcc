@@ -1,14 +1,17 @@
 import { TestBed } from '@angular/core/testing';
-import { subscribeSpyTo, autoUnsubscribe } from '@hirez_io/observer-spy';
-import { PAGE_SIZE, PokeApiService, POKEMON_MAX_AMOUNT } from './poke-api.service';
-import PokemonDataJson from './pokemon-data.json';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { subscribeSpyTo } from '@hirez_io/observer-spy';
+import { LIST_POKEMON_URL, PokeApiService } from './poke-api.service';
 
 describe('PokeApiService (OBSERVER-SPY)', () => {
   let service: PokeApiService;
-  autoUnsubscribe();
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(PokeApiService);
   });
 
@@ -17,12 +20,15 @@ describe('PokeApiService (OBSERVER-SPY)', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should return observable with data retrieved from json file', () => {
-    const getPokemonListSpy = subscribeSpyTo(service.getPokemonList());
+  it('should perform a request to retrieve list of pokemons from API', () => {
+    const page = 5;
+    const searchText = 'Pikachu';
+    subscribeSpyTo(service.getPokemonList(page, searchText));
 
-    expect(getPokemonListSpy.getLastValue()).toEqual({
-      last: PAGE_SIZE >= POKEMON_MAX_AMOUNT,
-      content: PokemonDataJson.slice(0, PAGE_SIZE)
-    })
+    const req = httpTestingController.match(request => request.url === LIST_POKEMON_URL)[0];
+
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('page')).toBe(page.toString());
+    expect(req.request.params.get('searchText')).toBe(searchText);
   })
 });

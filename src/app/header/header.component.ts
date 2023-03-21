@@ -21,11 +21,8 @@ import { Observable } from 'rxjs';
 export class HeaderComponent {
   protected team$: Observable<Pokemon[]>;
 
-  constructor(private router: Router, private store: Store<AppState>) {
+  constructor(private store: Store<AppState>) {
     this.team$ = this.store.select(selectTeam);
   }
 
-  navigateToPokedex(): void {
-    this.router.navigate([ROUTES.POKEDEX_ROUTE])
-  }
 }

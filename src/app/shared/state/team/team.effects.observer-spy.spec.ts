@@ -9,7 +9,7 @@ import { AppState } from "../app.state";
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from "@angular/material/snack-bar";
 import { addPokemon } from "./team.actions";
 import { INITIAL_ACTION } from "src/app/tests/utils";
-import { autoUnsubscribe, subscribeSpyTo } from "@hirez_io/observer-spy";
+import { subscribeSpyTo } from "@hirez_io/observer-spy";
 
 describe('Team Effects (OBSERVER-SPY)', () => {
   let effects: TeamEffects;
@@ -19,8 +19,6 @@ describe('Team Effects (OBSERVER-SPY)', () => {
   const initialState: AppState = {
     team: []
   };
-
-  autoUnsubscribe();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
