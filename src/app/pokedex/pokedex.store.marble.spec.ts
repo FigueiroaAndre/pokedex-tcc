@@ -2,7 +2,6 @@ import { TestBed } from "@angular/core/testing";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { cold, getTestScheduler } from "jasmine-marbles";
 import { Subscription } from "rxjs";
-import { TestScheduler } from "rxjs/testing";
 import { PokeApiService } from "../shared/data-access/poke-api.service";
 import { RequestStatus } from "../shared/models/request-status.model";
 import { createPokemonListMock } from "../tests/mocks/pokemon.mock";
@@ -38,7 +37,6 @@ describe('PokedexStore (MARBLE)', () => {
     subscription = null;
   })
 
-
   afterEach(() => {
     subscription?.unsubscribe();
   });
@@ -65,7 +63,6 @@ describe('PokedexStore (MARBLE)', () => {
     //                                   -----a| From second request
     const resultMarble =        'a----b--(cd)-e';
 
-
     pokeApiServiceSpy.getPokemonList.and.returnValue(cold(requestMarble, { a: { last: false, content: firstPageOfPokemonData }}));
     service = TestBed.inject(PokedexStore);
     pokeApiServiceSpy.getPokemonList.and.returnValue(cold(requestMarble, { a: { last: true, content: secondPageOfPokemonData }}));
@@ -89,7 +86,6 @@ describe('PokedexStore (MARBLE)', () => {
     const requestMarble =       '--a|';
     const triggerEffectMarble = '-----a';
     const resultMarble =        'a-b--c';
-
 
     pokeApiServiceSpy.getPokemonList.and.returnValue(cold(requestMarble, { a: { last: true, content: firstPageOfPokemonData} }));
     service = TestBed.inject(PokedexStore);
@@ -155,6 +151,7 @@ describe('PokedexStore (MARBLE)', () => {
       },
       c: () => service.retryLastRequest()
     });
+
     subscription = triggerAction$.subscribe(action => action());
     const expectedApiTrigger$ = cold(resultMarble, {
       a: { requestRetryCount: 0, currentPage: 0, lastPage: false, searchText: '' },
@@ -173,7 +170,6 @@ describe('PokedexStore (MARBLE)', () => {
     const requestMarble = '--a|';
     const resultMarble =  'a-b 1s c';
 
-    
     getTestScheduler().run(({cold, expectObservable}) => {
       pokeApiServiceSpy.getPokemonList.and.returnValue(cold(requestMarble, { a: { last: false, content: firstPageOfPokemonData }}));
       service = TestBed.inject(PokedexStore);

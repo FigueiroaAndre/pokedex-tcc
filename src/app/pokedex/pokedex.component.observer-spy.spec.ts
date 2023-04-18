@@ -10,7 +10,6 @@ import { AppState } from '../shared/state/app.state';
 import { addPokemon, removePokemon } from '../shared/state/team/team.actions';
 import { createPokemonListMock, createPokemonMock } from '../tests/mocks/pokemon.mock';
 import { dispatchNewInputValue } from '../tests/utils';
-
 import { PokedexComponent } from './pokedex.component';
 import { PokedexStore } from './pokedex.store';
 

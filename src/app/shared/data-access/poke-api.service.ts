@@ -4,8 +4,6 @@ import { Observable } from 'rxjs';
 import { ListResult } from '../models/list-result.model';
 import { Pokemon } from '../models/pokemon.model';
 
-export const PAGE_SIZE = 20;
-export const POKEMON_MAX_AMOUNT = 151;
 export const LIST_POKEMON_URL = 'http://localhost:3000/pokemon';
 
 @Injectable({
